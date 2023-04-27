@@ -11,6 +11,9 @@ import java.util.Scanner;
 public class Projekt_2 {
     //skapar ett globalt fält som användas till att spara om en stol är ledig eller inehåller personnumert av den som sitter där 
     static long[] stol = new long[21];
+    static String[] fnamn = new String[21];
+    static String[] enamn = new String[21];
+    static char[] kön = new char[21];
     
     /**
      * @param args the command line arguments
@@ -46,7 +49,8 @@ public class Projekt_2 {
                                  4: Beräkan vinsten av antalet sålda biljetter
                                  5: Hitta bokning
                                  6: Ta bort en bokning
-                                 7: Avsluta programet
+                                 7: Skriv ut alla pasagerare
+                                 8: Avsluta programet
                                  val: """);
                 
                 try{
@@ -63,7 +67,7 @@ public class Projekt_2 {
                 
                 // kollar om användaren har skrivit in ett giltigt alternativ
                 //om ja så hopar krogramet ur loppen som börga på rad 39
-                if(val >=1 && val <= 7){
+                if(val >=1 && val <= 8){
                     break;
                 }
                 
@@ -80,7 +84,8 @@ public class Projekt_2 {
                 case 4 -> kalk_vinst();
                 case 5 -> hitta_bokning();
                 case 6 -> tabort();
-                case 7 -> run=false;
+                case 7 -> skriv_ut();
+                case 8 -> run=false;
             }
             
         }while(run);
@@ -139,8 +144,8 @@ public class Projekt_2 {
             
         }while(true);
         
-        //sätter in användaren personnumert i stolen som användaren vill sitta i
-        stol[val-1] = ange_Pnum();
+        //sätter in användarens information i stolen som användaren vill sitta i
+        plaserar(val-1);
         
     }
     
@@ -199,8 +204,8 @@ public class Projekt_2 {
             
         }while(true);
         
-        //skriver in användaren personnumer på stolen de valde
-        stol[val-1] = ange_Pnum();
+        //skriver in användarens information på stolen de valde
+        plaserar(val-1);
         
     }
     
@@ -249,15 +254,187 @@ public class Projekt_2 {
     }
     
     static void hitta_bokning(){
+        Scanner scan = new Scanner(System.in);
+        int val;//är variaben som använs så att användaren kan skriva in sit val
+        
+        //gör så att programet kan håppa hit när den vill
+        do{ 
+            //skrivet ur alternativen
+            System.out.print("""
+                             välj alternativ du vill hita bokning med
+                             1: personnummer
+                             2: namn
+                             val: """);
+
+            try{//går så att användaren inta kan kracha systemet
+                val = scan.nextInt();//låter användaren skriva in sit val
+            }catch(Exception e){//gårs om ett prublem uppstod
+                System.out.println("ogiltigt svar\nmårste vara en sifra");
+                continue;//hoppar till börgan an loolen
+            }
+            
+            if(val < 1 || val > 2){//kollar om användarens val är ett giltigt alternativ
+                System.out.println("Ogiltigt alternativ");
+                continue;//hoppar till börgan an loolen
+            }
+            
+            break;//hoppar ur loopen
+            
+        }while(true);
+        
+        switch(val){//kör användaren val
+            case 1 -> hitta_bokning_Pnum();
+            case 2 -> hitta_bokning_namn();
+        }
+        
+    }
+    
+    static void tabort(){//kåden för den hära är nästan den samma som för "hitta_bokning" mad bara lite andra ord som skrivs ut och leter till andra funktioner
+        Scanner scan = new Scanner(System.in);
+        int val;
+        do{
+            System.out.print("""
+                             välj alternativ du vill ta bort bokning med
+                             1: personnummer
+                             2: namn
+                             val: """);
+
+            try{
+                val = scan.nextInt();
+            }catch(Exception e){
+                System.out.println("ogiltigt svar\nmårste vara en sifra");
+                continue;
+            }
+            
+            if(val < 1 || val > 2){
+                System.out.println("Ogiltigt alternativ");
+                continue;
+            }
+            
+            break;
+            
+        }while(true);
+        
+        switch(val){
+            case 1 -> tabort_Pnum();
+            case 2 -> tabort_namn();
+        }
+        
+    }
+    
+    static void skriv_ut(){
+        Scanner scan = new Scanner(System.in);
+        int längd = 0;//används till att bestämma längden på fälten där den temporära datan om pasagerare förvaras
+        int val;//varisben som använd för att spara användaren val
+        
+        for(int i = 0; i < stol.length; i++){//kollar igenom alla stolar och räknar hur många som är bokade
+            if(stol[i] != -1){
+                längd++;
+            }
+        }
+        
+        if(längd == 0){//om ingen stol är bokar så avslutas funktionen
+            System.out.println("Det fins inga bokningar för tilfället");
+            return;//avslutar funktionen
+        }
+        
+        long[] pnum = new long[längd];       //kommer spara personnumter från alla stolar som är bokade
+        String[] lfnamn = new String[längd]; //kommer spare förnamnet från alla stolar som är bokade
+        String[] lenamn = new String[längd]; //kommer spara efternamnet från alla stolar som är kokade
+        int[] lstol = new int[längd];        //kommar spara stolsnumret för alla stolar som är bokade
+        int plats = 0; //kommer hålla kol på hur många platser från fälten över som är upptagna
+        
+        for(int i = 0; i < stol.length; i++){//skriver in datan från stolarna till de lokala fälten
+            if(stol[i] != -1){ 
+                pnum[plats] = stol[i];
+                lfnamn[plats] = fnamn[i];
+                lenamn[plats] = enamn[i];
+                lstol[plats] = i+1;
+                plats++;
+            }
+        }
+        
+        do{//låter programmet hoppa hit när den vill
+            //skriver ut alternativen användaren kan välja
+            System.out.print("""
+                               Hur vill du skriva ut pasagerarne
+                               1: stolsårdning
+                               2: åldersårning
+                               val: """);
+            
+            try{//ser till så att användaren inte kan kracha porgramet
+                val = scan.nextInt();//låter användaren skriva in sit val
+            }catch(Exception e){//om ett prublem uppstår
+            System.out.println("Ogiltigt svar\nmåste vara en sifra");
+            continue;//hoppar till börgan av loopen
+            }
+            
+            if(val < 1 || val > 2){//kollar om användarens val är ett giltigt alternativ
+                System.out.println("Ogiltigt alternativ");
+                continue;//hoppar till börgan av loopen
+            }
+            
+            break;//hoppar ut loopen
+            
+        }while(true);
+        
+        if(val == 2){//kollar om användaren valde alternativ två
+            sotera(pnum, lfnamn, lenamn, lstol);//soterar de lokale fälten i åldersårdning
+        }
+        
+        for(int i = 0; i < pnum.length; i++){//skriver ut informationen för alla bokade stolar
+            System.out.println(lfnamn[i] + " " + lenamn[i] + " " + pnum[i] + " stol: "+ lstol[i]);
+        }
+        
+    }
+    
+    
+    static void plaserar(int plats){
+        Scanner scan = new Scanner(System.in);
+        
+        long pnum;//variben där användarens personnummer kommer temporärt plaseras i
+        String lfnamn;//variaben där användarens förnamn kommer temporärt plaseras i 
+        String lenamn;//variaben där användarens efternamn kommer tempotärt plaseras i
+        char lkön;//variaben där användarens kön kommer temporärt plasers i
+        char sant;//variaben som låter användaren bekräfta om informationen de har gät är korekt
+        
+        do{//programet hoppa hit om informationen är fel
+            
+            pnum = ange_Pnum();//frågar efter användarens personnummer
+            lfnamn = ange_namn(true);//frågar efter användarens förnamn
+            lenamn = ange_namn(false);//frågar efter användarens efternamn
+            lkön = ange_Kön();//frågar efter anvåndaren kön
+            
+            //skriver ut informationen användaren gav så att användaren kan bekränfa om det är rätt
+            System.out.println("\nNamn: " + lfnamn + " " + lenamn + "\nPersonnummer: " + pnum + "\nkön: " + lkön);
+            System.out.print("Är deta korekt(y/n): ");
+            
+            sant = scan.next().charAt(0);//låter användaren skriva in en strin som prugramet far sen första teknet ifrån och sparar det
+            
+            if(sant == 'y'){//om användaren svarade "y" så komer programmet hoppa ur lopen anars så startas loopen om
+                break;
+            }
+            
+        }while(true);
+        
+        //skriver in informationen användaren anvav i rätt fält
+        stol[plats] = pnum;
+        fnamn[plats] = lfnamn;
+        enamn[plats] = lenamn;
+        kön[plats] = lkön;
+        
+    }
+    
+    static void hitta_bokning_Pnum(){
         
         //tar in personnumret som skas hittas
         long pNum = ange_Pnum();
         
-        //kollar igenom vargige plats om det har pärsonnumret som söks efter
+        //kollar igenom varje plats om det har personnummret som söks efter
         for(int i = 0; i < stol.length; i++){
-            if(stol[i] == pNum){
-                System.out.println("Du sitter på plats "+(i+1));
-                return;
+            if(stol[i] == pNum){//kollar om stol i inehåller personnumret som söks efter
+                System.out.println("Du sitter på plats "+(i+1));//skriver ut platsen om ett matchande personnummer hittas
+                return;//avslutar funktionen
             }
         }
         //skrivs ut om personnummret inte hittas
@@ -265,16 +442,36 @@ public class Projekt_2 {
         
     }
     
-    static void tabort(){
-        //tar in personnummret som skas ta borts
+    static void hitta_bokning_namn(){
+        
+        //tar in för och efternamn som prugramet ska leta efter
+        String lfnamn = ange_namn(true);
+        String lenamn = ange_namn(false);
+        
+        for(int i = 0; i < fnamn.length; i++){//kollar igenom alla stolar om de har samma för och efternamn sparade i sig
+            if(lfnamn.equals(fnamn[i]) && lenamn.equals(enamn[i])){
+                System.out.println("Du sitter på plats "+(i+1));//skrive ut om programet har hittat en stol med matchande för och efternamn
+                return;//avslutar fuktionen
+            }
+        }
+        //skrivs ut om namnet inte hittas
+        System.out.println("Det fins inget plats som är bokad under det här namnet");
+        
+    }
+    
+    static void tabort_Pnum(){
+        //tar in personnummret som lesas efter
         long pNum = ange_Pnum();
         
-        //kollar igenom alla stolar för perssonnumret som skars ta borts
+        //kollar igenom alla stolar för perssonnumret som letas efter
         for(int i = 0; i < stol.length; i++){
             if(stol[i] == pNum){
-                stol[i] = -1; //markerar att stolen är ledig
-                System.out.println("Din bokning har tagits bort");
-                return;
+                stol[i] = -1;//markerar att stolen är ledig
+                fnamn[i] = "";//tar bort förnannet
+                enamn[i] = "";//far bort efternamnet
+                kön[i] = '\0';//kar bort könet
+                System.out.println("Din bokning har tagits bort");//skriver ut att bokningen är borttagen
+                return;//avslutar funktionen
             }
         }
         //skrivs ut om personnumret inte hitas
@@ -282,11 +479,30 @@ public class Projekt_2 {
         
     }
     
+    static void tabort_namn(){
+        
+        String lfnamn = ange_namn(true);//hämtar in förnamnet som söks efter
+        String lenamn = ange_namn(false);//hämtar in efternamnet som söks efter
+        
+        for(int i = 0; i < fnamn.length; i++){//kollar igennom alla stolar efter det spesifierade för och efternamnet
+            if(lfnamn.equals(fnamn[i]) && lenamn.equals(enamn[i])){
+                stol[i] = -1;//markerar att stolen är ledig
+                fnamn[i] = "";//tar bort förnannet
+                enamn[i] = "";//far bort efternamnet
+                kön[i] = '\0';//kar bort könet
+                System.out.println("Din bokning har tagits bort");//skriver ut att bokningen är borttagen
+                return;//avslutar funktionen
+            }
+        }
+        //skrivs ut om namnet inte hittas
+        System.out.println("Det fins inget plats som är bokad under det här namnet");
+        
+    }
     
     static boolean koll_f(int koll){
         //kollar om väret som matas in är en fönsterplats
         for(int i = 0; i < stol.length; i += 4){
-            if(koll == i){ //kolar om värdet är lika med i
+            if(koll == i){ //kolar om värdet är lika med i som är en fönsterplats
                 return true;
             }
             if(i+5 < stol.length && koll == i+3){ //kollar om värdet är lika med i+3 och om i+5 är en existerande stol
@@ -299,7 +515,7 @@ public class Projekt_2 {
     static long ange_Pnum(){
         Scanner scan = new Scanner(System.in);
         
-        long pNum = 0;
+        long pNum;
         do{ //programet kan håppa hit när den vill
             System.out.print("Vad är dit personnummer: ");
             
@@ -325,6 +541,49 @@ public class Projekt_2 {
             return pNum;
             
         }while(true);
+    }
+    
+    static String ange_namn(boolean för){
+        Scanner scan = new Scanner(System.in);
+        
+        String pos;//variaben som kommer inefålla "för" eller "efter" 
+        
+        if(för){//fom för är sant så är matas "för" in i pos annas masta "efter" in 
+            pos = "för";
+        }else{
+            pos = "efter";
+        }
+        
+        System.out.print("Ange dit " + pos + "namn: ");//skriver ut att användaren ska ange sit namn
+        
+        return scan.nextLine();//låter användaren ange sit namn och sen ger ut det
+    }
+    
+    static char ange_Kön(){
+        Scanner scan = new Scanner(System.in);
+        
+        char lkön;//variaben där användarens kön kommer temporärs sparas
+        
+        do{//startar en loop
+            
+            //skriver ut altenativen användaren kan välja på
+            System.out.print("""
+                             Ange dit kön
+                             m: man
+                             k: kvinna
+                             a: annat/vill inte ange
+                             svar: """);
+            
+            lkön = scan.next().charAt(0);//låter användaren skrive in sit svar
+            
+            if(lkön == 'm' || lkön == 'k' || lkön == 'a'){//kollar om avaret snvändaren gav är giltigt
+                return lkön;//get ut värdet på variaben
+            }
+            
+            System.out.println("Inte ett giltigt svar");//skriver tu att svaren användaren gav var inte giltigt
+            
+        }while(true);
+        
     }
     
     static boolean koll_persNum(long num){
@@ -386,6 +645,51 @@ public class Projekt_2 {
             }
         }
         return false;
+    }
+    
+    static void sotera(long[] pnum, String[] lfnamn, String[] lenamn, int[] lstol){
+        
+        for(int i = 0; i < pnum.length; i++){//kollar igenom personnummret på bokningar
+            if(get_num(9, 2, pnum[i]) < 23){//kom personnumrets år är mindre än 23
+                pnum[i] += 10000000000l;//lägger på en etta på 11 platsen för att göra personnumret större
+            }
+        }
+        
+        //soteringsystem som osdnar nomrena fråm minst till störst
+        for(int i = 0; i < pnum.length-1; i++){
+            int minst = i;//variabel som sparar positionen av det minsta värdet algoritmen har hittat
+            for(int j = i+1; j < pnum.length; j++){//kollar igenom alla fält till höger om i för ett mindre värde
+                if(pnum[minst] > pnum[j]){//kollar om värdet i j är mindre än värdet i minst
+                    minst = j;//uppdaterar positionen för det minsta värdet om ett mindre värde har hitas
+                }
+            }
+            
+            //byter plats på personnumret mellan i och platsen där det minsta värdet hitades
+            long temp = pnum[i]; 
+            pnum[i] = pnum[minst];
+            pnum[minst] = temp;
+            
+            //byter plats på förnamnet mellan i och platsen där det minsta värdet hitades
+            String tempf = lfnamn[i];
+            lfnamn[i] = lfnamn[minst];
+            lfnamn[minst] = tempf;
+            
+            //byter plats på efternamnet mellan i och platsen där det minsta värdet hitades
+            String tempe = lenamn[i];
+            lenamn[i] = lenamn[minst];
+            lenamn[minst] = tempe;
+            
+            //byter plats på stolspositionen mellan i och platsen där det minsta värdet hitades
+            int temps = lstol[i];
+            lstol[i] = lstol[minst];
+            lstol[minst] = temps;
+        }
+        
+        //tar bort allt efter 10 sifrer för alla personnummer
+        for(int i = 0; i < pnum.length; i++){
+            pnum[i] %= 10000000000l;
+        }
+        
     }
     
 }
